@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Кредитный Калькулятор</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Кредитный калькулятор</h1>
+    <form id="loan-form">
+      <input type="text" id="fio" placeholder="Ваше ФИО" required>
+      <input type="number" id="amount" placeholder="Сумма кредита" required>
+      <input type="number" id="interestRate" placeholder="Процентная ставка" required>
+      <input type="number" id="termYears" placeholder="Срок в годах" required>
+      <button type="submit">Рассчитать</button>
+    </form>
+    <div id="result"></div>
+    <div id="error"></div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
