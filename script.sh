@@ -1,15 +1,8 @@
 project11/
-├── backend/
-│   ├── app.js
-│   ├── public/
-│   │   ├── index.html
-│   │   ├── style.css
-│   │   ├── script.js
-
-│
-├── frontend/           # Клиентская часть
-│   ├── index.html      # Главная страница
-│   ├── style.css       # Стили
-│   ├── script.js       # Логика на JavaScript
-│
-└── .env                # Настройки окружения (например, для подключения MongoDB)
+  backend/
+    app.js              # Main server file with routes
+    public/
+      index.html        # Frontend HTML file
+      style.css         # Frontend CSS file
+      script.js         # Frontend JS file
+    .env                # Environment variables for PostgreSQL credentials

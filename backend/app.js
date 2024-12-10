@@ -1,55 +1,79 @@
-const express = require("express");
-const mongoose = require("mongoose");
-const dotenv = require("dotenv");
-const cors = require("cors");
-
-dotenv.config(); // Загружаем переменные окружения
+require('dotenv').config(); // Load environment variables from .env file
+const express = require('express');
+const { Pool } = require('pg');
+const path = require('path'); // For serving static files
+const cors = require('cors');
 
 const app = express();
-app.use(cors());
-app.use(express.json());
+app.use(express.json()); // For handling JSON data in request body
 
-// Подключаемся к MongoDB
-const mongoURI = process.env.MONGO_URI || "mongodb://localhost:27017/mydatabase"; // Используем строку из .env или дефолтную
+// Serve static files (index.html, style.css, script.js)
+app.use(express.static(path.join(__dirname, 'public')));
 
-mongoose
-  .connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true, serverSelectionTimeoutMS: 30000 })
-  .then(() => console.log("MongoDB connected"))
-  .catch((err) => {
-    console.error("MongoDB connection error:", err);
-    process.exit(1); // Завершаем приложение при ошибке подключения
-  });
-
-// Модель кредита
-const creditSchema = new mongoose.Schema({
-  fio: { type: String, required: true },
-  amount: { type: String, required: true },
-  interestRate: { type: String, required: true },
-  termYears: { type: String, required: true },
+// PostgreSQL connection pool setup
+const pool = new Pool({
+  user: process.env.PG_USER,       // PostgreSQL user
+  host: process.env.PG_HOST,       // PostgreSQL host (localhost)
+  database: process.env.PG_DATABASE, // PostgreSQL database name
+  password: process.env.PG_PASSWORD, // PostgreSQL password
+  port: process.env.PG_PORT,       // PostgreSQL port (5432 by default)
 });
 
-const Credit = mongoose.model("Credit", creditSchema);
-
-// Главная страница
-const path = require("path");
-
-// Middleware для статических файлов
-app.use(express.static(path.join(__dirname, "public")));
-
-// Роут для добавления кредита в базу данных
-app.post("/add-credit", async (req, res) => {
-  const { fio, amount, interestRate, termYears } = req.body;
-  try {
-    const newCredit = new Credit({ fio, amount, interestRate, termYears });
-    await newCredit.save();
-    res.status(201).json(newCredit);
-  } catch (err) {
-    res.status(400).json({ error: "Ошибка при сохранении данных: " + err.message });
+// Check PostgreSQL connection
+pool.connect((err) => {
+  if (err) {
+    console.error('Error connecting to PostgreSQL:', err.stack);
+  } else {
+    console.log('Successfully connected to PostgreSQL');
   }
 });
 
-// Запуск сервера
+// Route to serve the index page (static HTML)
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// Route to handle adding a new loan to the database
+app.post('/api/add-credit', async (req, res) => {
+  const { fio, amount, interestRate, termYears } = req.body;
+
+  // Check that all fields are provided
+  if (!fio || !amount || !interestRate || !termYears) {
+    return res.status(400).json({ error: 'Все поля обязательны для заполнения' });
+  }
+
+  console.log('Received data:', { fio, amount, interestRate, termYears });
+
+  try {
+    // Insert data into the employee table
+    const query = `
+      INSERT INTO employee(fio, amount, interest_rate, term_years)
+      VALUES($1, $2, $3, $4) RETURNING *;
+    `;
+    const values = [fio, amount, interestRate, termYears];
+    
+    // Execute the query using the pool
+    const result = await pool.query(query, values);  // Use the pool to execute the query
+
+    console.log('Inserted row:', result.rows[0]);  // Log inserted row
+
+    res.status(201).json(result.rows[0]);  // Send the inserted row back as a response
+  } catch (err) {
+    console.error('Error inserting data:', err);
+    res.status(500).json({ error: 'Ошибка при добавлении данных в базу' });
+  }
+});
+
+// Enable CORS for cross-origin requests
+app.use(cors());
+
+// Start the server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
+});
+
+// Graceful shutdown
+process.on('exit', () => {
+  pool.end();  // Close the pool connection when the application is about to exit
 });

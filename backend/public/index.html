@@ -7,18 +7,117 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="container">
-    <h1>Кредитный калькулятор</h1>
-    <form id="loan-form">
-      <input type="text" id="fio" placeholder="Ваше ФИО" required>
-      <input type="number" id="amount" placeholder="Сумма кредита" required>
-      <input type="number" id="interestRate" placeholder="Процентная ставка" required>
-      <input type="number" id="termYears" placeholder="Срок в годах" required>
-      <button type="submit">Рассчитать</button>
-    </form>
-    <div id="result"></div>
-    <div id="error"></div>
+  <!-- Navbar -->
+  <div class="navbar">
+    <a href="javascript:void(0)" onclick="reloadPage()">Главная</a>
+    <a href="javascript:void(0)" onclick="toggleCalculator()">Калькулятор</a>
+    <a href="javascript:void(0)" onclick="toggleNews()">Новости</a>
+
+    <div id="news" class="hidden">
+      <h2>Новости Банка</h2>
+      <ul>
+        <li><strong>Новая процентная ставка:</strong> Мы обновили процентные ставки по кредитам, чтобы они стали еще более выгодными для вас.</li>
+        <li><strong>Открытие нового филиала:</strong> Наш новый филиал открылся в центре города. Мы рады видеть вас!</li>
+        <li><strong>Новая услуга:</strong> Мы запускаем новый сервис онлайн-заявок на кредит. Быстро и удобно!</li>
+      </ul>
+    </div>
+
+    <a href="javascript:void(0)" onclick="toggleContacts()">Контакты</a>
+
+    <div id="contacts" class="hidden">
+      <h2>Контакты</h2>
+      <p>Телефон: +998 (93) 474-39-18</p>
+      <p>Наш адрес: ул. Амир Темур 119, Ташкент. Узбекистан</p>
+    </div>
   </div>
+
+  <!-- Main Content -->
+  <div class="container">
+    <!-- Hidden Intro Text -->
+    <div id="intro-text" class="hidden">
+      <p>Этот сайт предназначен для подачи онлайн-заявок на кредит. Вы можете рассчитать сумму кредита, процентную ставку и срок, а также подать заявку через форму калькулятора.</p>
+    </div>
+
+    <!-- Hidden Calculator Form -->
+    <div id="calculator" class="hidden">
+      <h1>Кредитный калькулятор</h1>
+      <form id="loan-form">
+        <input id="fio" type="text" placeholder="ФИО" required />
+        <input id="amount" type="number" placeholder="Сумма кредита" required />
+        <input id="interestRate" type="number" placeholder="Процентная ставка" required />
+        <input id="termYears" type="number" placeholder="Срок в годах" required />
+        
+        <button type="button" onclick="calculate()">Рассчитать</button>
+        <button type="button" onclick="clearForm()">Очистить</button>
+        <button type="submit">Отправить</button> <!-- Это кнопка "Отправить" -->
+      </form>
+
+      <div id="result"></div>
+      <div id="error"></div>
+      
+      <!-- Graph Section -->
+      <div id="payment-graph" class="hidden">
+        <h3>Выберите график платежей:</h3>
+        <select id="payment-type" onchange="toggleGraph()">
+          <option value="annuity">Аннуитетный</option>
+          <option value="differentiated">Дифференцированный</option>
+        </select>
+        <div id="annuity-table" class="hidden">
+          <h3>Аннуитетный график платежей</h3>
+          <table id="annuity-result">
+            <thead>
+              <tr>
+                <th>Месяц</th>
+                <th>Платеж</th>
+                <th>Процент</th>
+                <th>Основной долг</th>
+                <th>Остаток долга</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div id="differentiated-table" class="hidden">
+          <h3>Дифференцированный график платежей</h3>
+          <table id="differentiated-result">
+            <thead>
+              <tr>
+                <th>Месяц</th>
+                <th>Платеж</th>
+                <th>Процент</th>
+                <th>Основной долг</th>
+                <th>Остаток долга</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    
+    <!-- News Section -->
+    <div class="news">
+      <h2>Новости Банка</h2>
+      <ul>
+        <li><strong>Новая процентная ставка:</strong> Мы обновили процентные ставки по кредитам, чтобы они стали еще более выгодными для вас.</li>
+        <li><strong>Открытие нового филиала:</strong> Наш новый филиал открылся в центре города. Мы рады видеть вас!</li>
+        <li><strong>Новая услуга:</strong> Мы запускаем новый сервис онлайн-заявок на кредит. Быстро и удобно!</li>
+      </ul>
+    </div>
+    
+    <!-- Bank Address -->
+    <div class="address">
+      <a href="https://yandex.uz/maps/10335/tashkent/house/YkAYdA9mQE0BQFprfX90cntjYw==/?ll=69.286986%2C41.353707&z=16" target="_blank">
+        <p>Наш адрес: ул. Амир Темур 119, Ташкент. Узбекистан</p>
+      </a>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <p>&copy; 2024 AZABANK. Все права защищены.</p>
+  </div>
+
   <script src="script.js"></script>
 </body>
 </html>

@@ -1,40 +1,29 @@
-const express = require("express");
+// backend/routes/loan.js
+
+const express = require('express');
 const router = express.Router();
-const Loan = require("../../models/Loan");
+const { Pool } = require('pg'); // PostgreSQL connection
 
-// GET: Получить все заявки
-router.get("/", async (req, res) => {
-  try {
-    const loans = await Loan.find();
-    res.json(loans);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+// Assuming you already have a Pool initialized in app.js
+const pool = new Pool({
+  user: process.env.PG_USER,
+  host: process.env.PG_HOST,
+  database: process.env.PG_DATABASE,
+  password: process.env.PG_PASSWORD,
+  port: process.env.PG_PORT,
 });
 
-// POST: Добавить новую заявку
-router.post("/", async (req, res) => {
+router.post('/add-credit', async (req, res) => {
   const { fio, amount, interestRate, termYears } = req.body;
+  
   try {
-    const newLoan = new Loan({ fio, amount, interestRate, termYears });
-    await newLoan.save();
-    res.status(201).json(newLoan);
-  } catch (err) {
-    res.status(400).json({ error: err.message });
-  }
-});
-
-// DELETE: Удалить заявку
-router.delete("/:id", async (req, res) => {
-  try {
-    await Loan.findByIdAndDelete(req.params.id);
-    res.json({ message: "Loan deleted" });
-  } catch (err) {
-    res.status(404).json({ error: "Loan not found" });
+    const query = 'INSERT INTO employee(fio, amount, interest_rate, term_years) VALUES($1, $2, $3, $4)';
+    await pool.query(query, [fio, amount, interestRate, termYears]);
+    res.status(201).json({ message: 'Loan added successfully!' });
+  } catch (error) {
+    console.error('Error adding loan:', error);
+    res.status(500).json({ error: 'Error adding loan to the database' });
   }
 });
 
 module.exports = router;
-app.get("/", (req, res) => {
-  res.send("Welcome to the Credit API");
-});
