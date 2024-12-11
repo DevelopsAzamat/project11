@@ -47,7 +47,7 @@ app.post('/api/add-credit', async (req, res) => {
   try {
     // Insert data into the employee table
     const query = `
-      INSERT INTO employee(fio, amount, interest_rate, term_years)
+      INSERT INTO client(fio, amount, interest_rate, term_years)
       VALUES($1, $2, $3, $4) RETURNING *;
     `;
     const values = [fio, amount, interestRate, termYears];

@@ -5,18 +5,29 @@ body {
   padding: 0;
   background: url('img/bgproject.jpg') no-repeat center center fixed; /* фоновое изображение */
   background-size: cover;
+  height: auto;
+  display: flex;
+  flex-direction: column;
 }
-
 .container {
-  max-width: 400px;
-  margin: 50px auto;
-  background: rgba(255, 255, 255, 0.8); /* полупрозрачный фон */
-  padding: 20px;
   border-radius: 10px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  
+  padding: 20px;
+  max-width: 600px;
+  margin: 0 auto;
+  background-color: rgba(225, 238, 234, 0.849);
+}
+.hidden{
+  display: none;
+}
+body, html {
+  height: 100%;
+  margin: 0;
 }
 
+.show{
+  display: block;
+}
 h1 {
   text-align: center;
   color: #333;
@@ -35,7 +46,7 @@ nav {
 }
 
 .nav-container a, nav button {
-  color: white;
+  color: rgb(95, 140, 212);
   text-decoration: none;
   margin: 0 15px;
   font-size: 16px;
@@ -44,7 +55,7 @@ nav {
 nav button {
   padding: 10px 20px;
   background-color: #007bff;
-  color: white;
+  color: rgb(227, 177, 177);
   border: none;
   cursor: pointer;
   font-size: 16px;
@@ -65,17 +76,167 @@ nav .nav-container a:hover {
 }
 
 /* Футер */
-footer {
-  background-color: #333;
-  color: white;
+.footer {
+  background-color: #f1f1f1;
+  padding: 20px 0;
+  color: #333;
+  font-family: Arial, sans-serif;
+  margin-top: auto;
+  max-height: 200px;
+}
+
+.footer-container {
+  display: flex;
+  justify-content: space-around;
+  padding: 0 20px;
+}
+
+.footer-section h3 {
+  margin-bottom: 10px;
+  font-size: 18px;
+}
+
+.footer-section ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.footer-section ul li {
+  margin-bottom: 8px;
+}
+
+.footer-section ul li a {
+  color: #333;
+  text-decoration: none;
+}
+
+.footer-section ul li a:hover {
+  color: #007BFF;
+}
+
+.footer-bottom {
   text-align: center;
+  margin-top: 20px;
+  font-size: 14px;
+  color: #777;
+}
+.intro-text {
+justify-content: center;
+}
+#middle{
+  color: rgb(185, 181, 223);
   padding: 10px 0;
-  position: fixed;
-  width: 100%;
-  bottom: 0;
+  text-align: center;
+  background-color: rgba(35, 49, 45, 0.849);
+  justify-content: center;
+  font-size: large;
+  padding-left: 10px;
+  padding-right: 10px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+#exportBtn{
+  color: #77bb6e;
+  background-color: #333;
   
 }
 
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(5px);
+}
+
+.modal-content {
+  background: rgba(255, 255, 255, 0.9);
+  margin: 10% auto;
+  padding: 20px 30px;
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  max-width: 500px;
+  text-align: center;
+}
+.modal-content p {
+  font-size: 1rem;
+  color: #333;
+}
+.modal-content h2 {
+  color: #2575fc;
+  margin-bottom: 15px;
+}
+/* Кнопка закрытия модального окна */
+.close {
+  position: absolute;
+  right: 20px;
+  top: 15px;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #aaa;
+  cursor: pointer;
+}
+
+.close:hover {
+  color: #2575fc;
+}
+.modal-content label {
+  display: block;
+  margin: 10px 0 5px;
+  font-weight: bold;
+  text-align: left;
+}
+
+.modal-content input,
+.modal-content select {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 1rem;
+}
+
+.modal-content button {
+  width: 100%;
+  background: #6a11cb;
+  border: none;
+  color: #fff;
+  padding: 12px;
+  font-size: 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.modal-content button:hover {
+  background: #2575fc;
+}
+
+.close {
+  position: absolute;
+  right: 20px;
+  top: 15px;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #aaa;
+  cursor: pointer;
+}
+
+.close:hover {
+  color: #2575fc;
+}
+
+/* Убедимся, что кнопка "Оформить кредит" гармонирует с дизайном */
+.apply-loan button {
+  margin-top: 20px;
+  padding: 10px 25px;
+  font-size: 1rem;
+}
 /* Стили для формы */
 form input, form button {
   width: 95%;
@@ -109,7 +270,7 @@ body {
 
 .navbar {
   background-color: #2c3e50;
-  color: white;
+  color: rgb(187, 150, 150);
   padding: 10px 0;
   text-align: center;
 }
@@ -121,25 +282,16 @@ body {
   font-weight: bold;
 }
 
-.footer {
-  background-color: #2c3e50;
-  color: white;
-  padding: 20px 0;
-  text-align: center;
-  margin-top: 50px;
+
+a:hover {
+  color: red; /* Цвет ссылки при наведении */
+}
+a {
+  color: rgb(203, 203, 255); /* Цвет обычной ссылки */
 }
 
-.news {
-  background-color: #ecf0f1;
-  padding: 15px;
-  margin: 20px 0;
-  border-radius: 5px;
-}
-
-.container {
-  padding: 20px;
-  max-width: 800px;
-  margin: 0 auto;
+.hidden{
+  display: none;
 }
 
 h1 {
@@ -159,13 +311,8 @@ form input {
   border: 1px solid #ccc;
 }
 /* Скрываем элемент по умолчанию */
-.hidden {
-  display: none;
-}
+
 /* Скрываем элемент по умолчанию */
-.hidden {
-  display: none;
-}
 
 form button {
   padding: 10px;
@@ -183,11 +330,13 @@ form button:hover {
 
 .address {
   font-size: 16px;
-  color: #212932;
+  color: #ddf8df;
   text-align: center;
 
 }
-
+.hidden {
+  display: none;
+}
 /* Стиль для таблицы */
 table {
   width: 100%;
@@ -228,8 +377,7 @@ h3 {
   font-weight: bold;
   margin-top: 30px;
 }
-
-/* Стиль для скрытых таблиц */
 .hidden {
   display: none;
 }
+

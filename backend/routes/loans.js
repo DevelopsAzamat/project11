@@ -17,7 +17,7 @@ router.post('/add-credit', async (req, res) => {
   const { fio, amount, interestRate, termYears } = req.body;
   
   try {
-    const query = 'INSERT INTO employee(fio, amount, interest_rate, term_years) VALUES($1, $2, $3, $4)';
+    const query = 'INSERT INTO client(fio, amount, interest_rate, term_years) VALUES($1, $2, $3, $4)';
     await pool.query(query, [fio, amount, interestRate, termYears]);
     res.status(201).json({ message: 'Loan added successfully!' });
   } catch (error) {

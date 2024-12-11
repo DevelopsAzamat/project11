@@ -32,7 +32,7 @@ form.addEventListener("submit", async (e) => {
       resultDiv.innerHTML = `
         <h3>Результаты:</h3>
         <p>ФИО: ${result.fio}</p>
-        <p>Сумма кредита: ${result.amount} сумм.</p>
+        <p>Сумма кредита: ${result.amount} сум.</p>
         <p>Процентная ставка: ${result.interest_rate}%</p>
         <p>Срок: ${result.term_years} лет</p>
       `;
@@ -48,12 +48,8 @@ form.addEventListener("submit", async (e) => {
 });
 
 function toggleCalculator() {
-  const introText = document.getElementById('intro-text');
-  const calculator = document.getElementById('calculator');
-
-  // Скрыть текст и показать калькулятор
-  introText.classList.add('hidden');
-  calculator.classList.remove('hidden');
+  const cont = document.querySelector("#containermain");
+  cont.classList.toggle("hidden")
 }
 
 function toggleNews() {
@@ -65,7 +61,10 @@ function toggleContacts() {
   const contacts = document.getElementById('contacts');
   contacts.classList.toggle('hidden'); // Переключаем класс hidden
 }
-
+function toggleAboutbank(){
+  const middle = document.getElementById('middle');
+  middle.classList.toggle('hidden'); // Переключаем класс hidden
+}
 function reloadPage() {
   location.reload(); // Перезагружает текущую страницу
 }
@@ -95,7 +94,6 @@ function calculate() {
   // Рассчитаем аннуитетный платеж
   const annuityPayment = amount * (monthlyRate * Math.pow(1 + monthlyRate, termMonths)) / (Math.pow(1 + monthlyRate, termMonths) - 1);
 
-  // Подготовим таблицу аннуитетного графика платежей
   let annuityTable = "";
   let remainingDebt = amount;
 
@@ -115,14 +113,11 @@ function calculate() {
     `;
   }
 
-  // Покажем таблицу
   document.getElementById('annuity-result').getElementsByTagName('tbody')[0].innerHTML = annuityTable;
-  document.getElementById('annuity-table').classList.remove('hidden');
 
   // Рассчитаем дифференцированный платеж
   let differentiatedTable = "";
   remainingDebt = amount;
-  const differentiatedPayments = [];
 
   for (let month = 1; month <= termMonths; month++) {
     const principalPayment = amount / termMonths;
@@ -130,32 +125,174 @@ function calculate() {
     const totalPayment = principalPayment + interestPayment;
     remainingDebt -= principalPayment;
 
-    differentiatedPayments.push({
-      month,
-      principalPayment,
-      interestPayment,
-      totalPayment,
-      remainingDebt
-    });
-  }
-
-  // Заполняем таблицу дифференцированного графика
-  let diffTableContent = "";
-  differentiatedPayments.forEach((payment) => {
-    diffTableContent += `
+    differentiatedTable += `
       <tr>
-        <td>${payment.month}</td>
-        <td>${payment.totalPayment.toFixed(2)}</td>
-        <td>${payment.interestPayment.toFixed(2)}</td>
-        <td>${payment.principalPayment.toFixed(2)}</td>
-        <td>${payment.remainingDebt.toFixed(2)}</td>
+        <td>${month}</td>
+        <td>${totalPayment.toFixed(2)}</td>
+        <td>${interestPayment.toFixed(2)}</td>
+        <td>${principalPayment.toFixed(2)}</td>
+        <td>${remainingDebt.toFixed(2)}</td>
       </tr>
     `;
-  });
+  }
 
-  document.getElementById('differentiated-result').getElementsByTagName('tbody')[0].innerHTML = diffTableContent;
-  document.getElementById('differentiated-table').classList.remove('hidden');
+  document.getElementById('differentiated-result').getElementsByTagName('tbody')[0].innerHTML = differentiatedTable;
 
   // Показываем блок выбора графика
   document.getElementById('payment-graph').classList.remove('hidden');
+  toggleGraph(); // Обновляем отображение выбранной таблицы
+}
+
+function toggleGraph() {
+  const paymentType = document.getElementById("payment-type").value;
+
+  // Скрываем обе таблицы сначала
+  document.getElementById('annuity-table').classList.add('hidden');
+  document.getElementById('differentiated-table').classList.add('hidden');
+
+  // Показываем выбранную таблицу
+  if (paymentType === "annuity") {
+    document.getElementById('annuity-table').classList.remove('hidden');
+  } else if (paymentType === "differentiated") {
+    document.getElementById('differentiated-table').classList.remove('hidden');
+  }
+}
+
+function clearForm() {
+  document.getElementById("loan-form").reset();
+  document.getElementById('annuity-result').getElementsByTagName('tbody')[0].innerHTML = "";
+  document.getElementById('differentiated-result').getElementsByTagName('tbody')[0].innerHTML = "";
+  document.getElementById('payment-graph').classList.add('hidden');
+  document.getElementById('error').innerHTML = "";
+}
+
+document.getElementById('exportBtn').addEventListener('click', function() {
+  const annuityTable = document.getElementById('annuity-result'); // Таблица для аннуитетного графика
+  const differentiatedTable = document.getElementById('differentiated-result'); // Таблица для дифференцированного графика
+  
+  // Убедитесь, что таблицы отображаются (если они скрыты, покажите их перед экспортом)
+  document.getElementById('differentiated-table').classList.remove('hidden'); // Убираем класс hidden
+
+  // Создание книги Excel
+  const wb = XLSX.utils.book_new();
+
+  // Добавление аннуитетной таблицы в книгу Excel
+  if (annuityTable) {
+      const annuitySheet = XLSX.utils.table_to_sheet(annuityTable);
+      XLSX.utils.book_append_sheet(wb, annuitySheet, "Аннуитетный график");
+  }
+
+  // Добавление дифференцированной таблицы в книгу Excel
+  if (differentiatedTable) {
+      const differentiatedSheet = XLSX.utils.table_to_sheet(differentiatedTable);
+      XLSX.utils.book_append_sheet(wb, differentiatedSheet, "Дифференцированный график");
+  }
+
+  // Скачивание файла Excel
+  XLSX.writeFile(wb, 'graphs.xlsx');
+});
+
+
+function openBankInfo() {
+  document.getElementById('bankModal').style.display = 'block';
+}
+
+function closeBankInfo() {
+  document.getElementById('bankModal').style.display = 'none';
+}
+
+// Функция для открытия модального окна
+function openLoanForm() {
+  const modalContent = document.querySelector('.modal-content');
+  modalContent.classList.remove('hidden'); // Убираем скрытие
+  document.getElementById('loanModal').style.display = 'block';
+}
+
+function closeLoanForm() {
+  const modalContent = document.querySelector('.modal-content');
+  modalContent.classList.add('hidden'); // Добавляем скрытие
+  document.getElementById('loanModal').style.display = 'none';
+}
+
+
+// Функция для отправки заявки
+function submitLoanApplication() {
+  const fullName = document.getElementById('fullName').value;
+  const birthDate = document.getElementById('birthDate').value;
+  const address = document.getElementById('address').value;
+  const serialpass = document.getElementById('serialpass').value;
+  const passnum = document.getElementById('passnum').value;
+  const pinflnum = document.getElementById('pinflnum').value;
+  const phone = document.getElementById('phone').value;
+  const clientType = document.getElementById('clientType').value;
+  const loanSum = parseFloat(document.getElementById('loanSum').value);
+
+  const loanData = {
+      fullName,
+      birthDate,
+      address,
+      serialpass,
+      passnum,
+      pinflnum,
+      phone,
+      clientType,
+      loanSum
+  };
+
+
+  // Проверка возраста
+  const [year, month, day] = birthDate.split('-').map(Number); 
+  const today = new Date();
+  const birthDateObj = new Date(year, month - 1, day);
+  const age = today.getFullYear() - birthDateObj.getFullYear();
+  const monthDiff = today.getMonth() - birthDateObj.getMonth();
+  const dayDiff = today.getDate() - birthDateObj.getDate();
+
+  if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+      age--;
+  }
+
+  if (age < 20) {
+      alert('Вы должны быть старше 20 лет для подачи заявки.');
+      return;
+  }
+
+  // Максимальная сумма в зависимости от типа клиента
+  let maxAmount = 0;
+  let rate = 0;
+
+  switch (clientType) {
+      case 'student':
+          maxAmount = 100000000; // 100 млн сум
+          rate = 13; // Ставка для студентов
+          break;
+      case 'physclient':
+          maxAmount = 500000000; // 500 млн сум
+          rate = 22; // Ставка для физических лиц
+          break;
+      case 'lawclient':
+          maxAmount = 1000000000; // 1 млрд сум
+          rate = 19; // Ставка для юридических лиц
+          break;
+  }
+
+  // Проверка на максимальную сумму
+  if (loanSum > maxAmount) {
+      alert(`Максимальная сумма для выбранной категории: ${maxAmount} сум.`);
+      return;
+  }
+
+  // Если все проверки пройдены, показываем успешную отправку заявки
+  alert(`Заявка принята!\nСтавка: ${rate}%\nСумма кредита: ${loanSum} сум.`);
+
+  // Закрываем форму
+  closeLoanForm();
+
+  // Заполняем калькулятор с данными из заявки
+  document.getElementById('loanAmount').value = loanSum;
+  document.getElementById('loanTerm').value = 1; // По умолчанию 1 лет
+  document.getElementById('interestRate').value = rate;
+
+  // Выполняем расчет
+  calculateLoan();
 }
