@@ -274,6 +274,13 @@ function submitLoanApplication() {
     return;
   }
 
+  // Если все данные корректны, продолжить обработку заявки
+  // Например, отправить данные на сервер:
+  console.log({
+    fullName, birthDate, address, serialpass, passnum, pinflnum, phone, email, clientType, loanSum
+  });
+
+
   // Данные для отправки на сервер
   const loanData = {
     fullName,
