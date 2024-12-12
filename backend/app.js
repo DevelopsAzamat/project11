@@ -1,22 +1,26 @@
-require('dotenv').config(); // Load environment variables from .env file
 const express = require('express');
-const { Pool } = require('pg');
-const path = require('path'); // For serving static files
+const path = require('path');
 const cors = require('cors');
+require('dotenv').config();
+const { Pool } = require('pg');
 
+// Initialize app and configure middleware
 const app = express();
-app.use(express.json()); // For handling JSON data in request body
+app.use(express.json());
+app.use(cors());
+app.use(express.static(path.join(__dirname, 'public')));  // Serve static files
 
-// Serve static files (index.html, style.css, script.js)
-app.use(express.static(path.join(__dirname, 'public')));
+// Import the routes from loans.js
+const loanRoutes = require('./routes/loans');
+app.use('/api', loanRoutes); // Prefix all loan-related routes with /api
 
-// PostgreSQL connection pool setup
+// PostgreSQL connection setup
 const pool = new Pool({
-  user: process.env.PG_USER,       // PostgreSQL user
-  host: process.env.PG_HOST,       // PostgreSQL host (localhost)
-  database: process.env.PG_DATABASE, // PostgreSQL database name
-  password: process.env.PG_PASSWORD, // PostgreSQL password
-  port: process.env.PG_PORT,       // PostgreSQL port (5432 by default)
+  user: process.env.PG_USER,
+  host: process.env.PG_HOST,
+  database: process.env.PG_DATABASE,
+  password: process.env.PG_PASSWORD,
+  port: process.env.PG_PORT,
 });
 
 // Check PostgreSQL connection
@@ -28,44 +32,10 @@ pool.connect((err) => {
   }
 });
 
-// Route to serve the index page (static HTML)
+// Serve the index page
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
-
-// Route to handle adding a new loan to the database
-app.post('/api/add-credit', async (req, res) => {
-  const { fio, amount, interestRate, termYears } = req.body;
-
-  // Check that all fields are provided
-  if (!fio || !amount || !interestRate || !termYears) {
-    return res.status(400).json({ error: 'Все поля обязательны для заполнения' });
-  }
-
-  console.log('Received data:', { fio, amount, interestRate, termYears });
-
-  try {
-    // Insert data into the employee table
-    const query = `
-      INSERT INTO client(fio, amount, interest_rate, term_years)
-      VALUES($1, $2, $3, $4) RETURNING *;
-    `;
-    const values = [fio, amount, interestRate, termYears];
-    
-    // Execute the query using the pool
-    const result = await pool.query(query, values);  // Use the pool to execute the query
-
-    console.log('Inserted row:', result.rows[0]);  // Log inserted row
-
-    res.status(201).json(result.rows[0]);  // Send the inserted row back as a response
-  } catch (err) {
-    console.error('Error inserting data:', err);
-    res.status(500).json({ error: 'Ошибка при добавлении данных в базу' });
-  }
-});
-
-// Enable CORS for cross-origin requests
-app.use(cors());
 
 // Start the server
 const PORT = process.env.PORT || 5000;
@@ -75,5 +45,5 @@ app.listen(PORT, () => {
 
 // Graceful shutdown
 process.on('exit', () => {
-  pool.end();  // Close the pool connection when the application is about to exit
+  pool.end();  // Close the pool connection on exit
 });

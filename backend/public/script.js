@@ -48,23 +48,40 @@ form.addEventListener("submit", async (e) => {
 });
 
 function toggleCalculator() {
+  hideAllTabs(); // Скрываем все вкладки
   const cont = document.querySelector("#containermain");
-  cont.classList.toggle("hidden")
+  cont.classList.toggle("hidden"); // Показываем или скрываем вкладку калькулятора
 }
 
 function toggleNews() {
+  hideAllTabs(); // Скрываем все вкладки
   const news = document.getElementById('news');
-  news.classList.toggle('hidden'); // Переключаем класс hidden
+  news.classList.toggle('hidden'); // Показываем или скрываем вкладку новостей
 }
 
 function toggleContacts() {
+  hideAllTabs(); // Скрываем все вкладки
   const contacts = document.getElementById('contacts');
-  contacts.classList.toggle('hidden'); // Переключаем класс hidden
+  contacts.classList.toggle('hidden'); // Показываем или скрываем вкладку контактов
 }
-function toggleAboutbank(){
+
+function toggleAboutBank() {
+  hideAllTabs(); // Скрываем все вкладки
   const middle = document.getElementById('middle');
-  middle.classList.toggle('hidden'); // Переключаем класс hidden
+  middle.classList.toggle('hidden'); // Показываем или скрываем вкладку о банке
 }
+
+// Скрывает все вкладки
+function hideAllTabs() {
+  const tabs = ['#containermain', '#news', '#contacts', '#middle'];
+  tabs.forEach(tab => {
+    const element = document.querySelector(tab);
+    if (element) {
+      element.classList.add('hidden'); // Добавляем класс hidden
+    }
+  });
+}
+
 function reloadPage() {
   location.reload(); // Перезагружает текущую страницу
 }
@@ -79,7 +96,8 @@ function clearForm() {
 }
 
 function calculate() {
-  const amount = parseFloat(document.getElementById("amount").value);
+  const rawAmount = document.getElementById("amount").value;
+  const amount = parseFloat(rawAmount.replace(/\s+/g, '')); // Убираем пробелы
   const interestRate = parseFloat(document.getElementById("interestRate").value);
   const termYears = parseInt(document.getElementById("termYears").value);
 
@@ -88,6 +106,16 @@ function calculate() {
     return;
   }
 
+  function formatNumber(input) {
+    // Убираем все пробелы и некорректные символы
+    const value = input.value.replace(/\s+/g, '').replace(/[^\d]/g, '');
+
+    // Форматируем число с пробелами
+    const formattedValue = value.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+
+    // Обновляем значение поля
+    input.value = formattedValue;
+  }
   const monthlyRate = (interestRate / 100) / 12;
   const termMonths = termYears * 12;
 
@@ -216,83 +244,77 @@ function closeLoanForm() {
 
 
 // Функция для отправки заявки
-function submitLoanApplication() {
-  const fullName = document.getElementById('fullName').value;
-  const birthDate = document.getElementById('birthDate').value;
-  const address = document.getElementById('address').value;
-  const serialpass = document.getElementById('serialpass').value;
-  const passnum = document.getElementById('passnum').value;
-  const pinflnum = document.getElementById('pinflnum').value;
-  const phone = document.getElementById('phone').value;
-  const clientType = document.getElementById('clientType').value;
-  const loanSum = parseFloat(document.getElementById('loanSum').value);
+// Функция для открытия модального окна
+function openLoanForm() {
+  document.getElementById('loanModal').style.display = 'block';
+}
 
+// Функция для закрытия модального окна
+function closeLoanForm() {
+  document.getElementById('loanModal').style.display = 'none';
+}
+
+// Функция для отправки заявки на кредит
+function submitLoanApplication() {
+  // Сбор данных формы
+  const fullName = document.getElementById('fullName').value.trim();
+  const birthDate = document.getElementById('birthDate').value.trim();
+  const address = document.getElementById('address').value.trim();
+  const serialpass = document.getElementById('serialpass').value.trim();
+  const passnum = document.getElementById('passnum').value.trim();
+  const pinflnum = document.getElementById('pinflnum').value.trim();
+  const phone = document.getElementById('phone').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const clientType = document.getElementById('clientType').value.trim();
+  const loanSum = parseFloat(document.getElementById('loanSum').value.trim());
+
+  // Проверка на корректность данных
+  if (!fullName || !birthDate || !address || !serialpass || !passnum || !pinflnum || !phone || !email || !clientType || isNaN(loanSum) || loanSum <= 0) {
+    alert("Пожалуйста, заполните все поля корректно.");
+    return;
+  }
+
+  // Данные для отправки на сервер
   const loanData = {
-      fullName,
-      birthDate,
-      address,
-      serialpass,
-      passnum,
-      pinflnum,
-      phone,
-      clientType,
-      loanSum
+    fullName,
+    birthDate,
+    address,
+    serialpass,
+    passnum,
+    pinflnum,
+    phone,
+    email,
+    clientType,
+    loanSum
   };
 
+  // Отправка данных на сервер
+  fetch("http://localhost:5000/api/submit-loan", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(loanData)
+  })
+  .then(response => response.json())
+  .then(result => {
+    if (result.error) {
+      alert("Ошибка при отправке заявки: " + result.error);
+    } else {
+      const rate = result.rate || 'неизвестно';
+      alert(`Заявка принята!\nСтавка: ${rate}%\nСумма кредита: ${loanSum} сум.`);
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    alert('Произошла ошибка при отправке заявки.');
+  });
 
-  // Проверка возраста
-  const [year, month, day] = birthDate.split('-').map(Number); 
-  const today = new Date();
-  const birthDateObj = new Date(year, month - 1, day);
-  const age = today.getFullYear() - birthDateObj.getFullYear();
-  const monthDiff = today.getMonth() - birthDateObj.getMonth();
-  const dayDiff = today.getDate() - birthDateObj.getDate();
-
-  if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
-      age--;
-  }
-
-  if (age < 20) {
-      alert('Вы должны быть старше 20 лет для подачи заявки.');
-      return;
-  }
-
-  // Максимальная сумма в зависимости от типа клиента
-  let maxAmount = 0;
-  let rate = 0;
-
-  switch (clientType) {
-      case 'student':
-          maxAmount = 100000000; // 100 млн сум
-          rate = 13; // Ставка для студентов
-          break;
-      case 'physclient':
-          maxAmount = 500000000; // 500 млн сум
-          rate = 22; // Ставка для физических лиц
-          break;
-      case 'lawclient':
-          maxAmount = 1000000000; // 1 млрд сум
-          rate = 19; // Ставка для юридических лиц
-          break;
-  }
-
-  // Проверка на максимальную сумму
-  if (loanSum > maxAmount) {
-      alert(`Максимальная сумма для выбранной категории: ${maxAmount} сум.`);
-      return;
-  }
-
-  // Если все проверки пройдены, показываем успешную отправку заявки
-  alert(`Заявка принята!\nСтавка: ${rate}%\nСумма кредита: ${loanSum} сум.`);
-
-  // Закрываем форму
+  // Закрытие формы после отправки
   closeLoanForm();
-
-  // Заполняем калькулятор с данными из заявки
-  document.getElementById('loanAmount').value = loanSum;
-  document.getElementById('loanTerm').value = 1; // По умолчанию 1 лет
-  document.getElementById('interestRate').value = rate;
-
-  // Выполняем расчет
-  calculateLoan();
 }
+
+// Открытие формы при необходимости
+document.getElementById('openLoanFormButton').addEventListener('click', openLoanForm);  // Если есть кнопка для открытия формы
+
+

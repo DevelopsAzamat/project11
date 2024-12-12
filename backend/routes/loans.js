@@ -1,10 +1,8 @@
-// backend/routes/loan.js
-
 const express = require('express');
-const router = express.Router();
-const { Pool } = require('pg'); // PostgreSQL connection
+const { Pool } = require('pg');
+const router = express.Router();  // Создание маршрутизатора
 
-// Assuming you already have a Pool initialized in app.js
+// PostgreSQL connection pool setup (reused from app.js)
 const pool = new Pool({
   user: process.env.PG_USER,
   host: process.env.PG_HOST,
@@ -12,18 +10,35 @@ const pool = new Pool({
   password: process.env.PG_PASSWORD,
   port: process.env.PG_PORT,
 });
-
-router.post('/add-credit', async (req, res) => {
-  const { fio, amount, interestRate, termYears } = req.body;
-  
+// POST route to submit loan application
+router.post('/submit-loan', async (req, res) => {
+  const {
+    fullName,
+    birthDate,
+    address,
+    serialpass,
+    passnum,
+    pinflnum,
+    phone,
+    email,
+    clientType,
+    loanSum
+  } = req.body;
   try {
-    const query = 'INSERT INTO client(fio, amount, interest_rate, term_years) VALUES($1, $2, $3, $4)';
-    await pool.query(query, [fio, amount, interestRate, termYears]);
-    res.status(201).json({ message: 'Loan added successfully!' });
+    const query = `
+      INSERT INTO creditor_client(
+        full_name, birth_date, address, passport_series, passport_number, 
+        pinfl, phone, email, client_type, loan_sum
+      ) 
+      VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *;
+    `;
+    const values = [fullName, birthDate, address, serialpass, passnum, pinflnum, phone, email, clientType, loanSum];
+    
+    const result = await pool.query(query, values);  // Execute query
+    res.status(201).json(result.rows[0]);  // Send back inserted row as response
   } catch (error) {
-    console.error('Error adding loan:', error);
-    res.status(500).json({ error: 'Error adding loan to the database' });
+    console.error('Error inserting data:', error);
+    res.status(500).json({ error: 'Ошибка при отправке данных' });
   }
 });
-
 module.exports = router;

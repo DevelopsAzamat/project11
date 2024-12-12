@@ -9,7 +9,7 @@
 <body>
   <!-- Navbar -->
   <div class="navbar">
-    <a href="javascript:void(0)" onclick="reloadPage()">Главная</a>
+    <a href="javascript:void(0)" onclick="reloadPage()" >Главная</a>
     <a href="javascript:void(0)" onclick="toggleCalculator()">Калькулятор</a>
     <a href="javascript:void(0)" onclick="toggleNews()">Новости</a>
     <a href="javascript:void(0)" onclick="toggleContacts()">Контакты</a>
@@ -20,11 +20,18 @@
         <li><strong>Открытие нового филиала:</strong> Наш новый филиал открылся в центре города. Мы рады видеть вас!</li>
         <li><strong>Новая услуга:</strong> Мы запускаем новый сервис онлайн-заявок на кредит. Быстро и удобно!</li>
       </ul>
+      <li><strong>Условия для клиентов:</strong>
+        <ul>
+          <li><strong>Студентам (от 21 года):</strong> Ставка 15% на кредиты.</li>
+          <li><strong>Физическим лицам:</strong> Ставка 23% на кредиты.</li>
+          <li><strong>Юридическим лицам:</strong> Ставка 27% на кредиты.</li>
+        </ul>
+      </li>
     </div>
     <div id="contacts" class="hidden">
       <h2>Контакты</h2>
       <p>Телефон: +998 (93) 474-39-18</p>
-      <p>Наш адрес: ул. Амир Темур 117, Ташкент. Узбекистан</p>
+      <a href="https://yandex.uz/maps/10335/tashkent/house/YkAYdA9nTUAEQFprfX90cn5jYg==/?ll=69.287453%2C41.353206&z=16" target="_blank" ><p class="address">Наш адрес: проспект Амира Темура, 117, Ташкент. Узбекистан</p></a>
     </div>
   </div>
   
@@ -32,85 +39,109 @@
     <p>
       Наш банк — это надежный финансовый партнер, который предоставляет широкий спектр услуг для физических и юридических лиц. Мы стремимся обеспечить удобство и качество обслуживания на каждом этапе взаимодействия.
     </p>
+    <br>
     <ul>
       <li><strong>Надежность:</strong> Мы успешно работаем на рынке более 20 лет, заслужив доверие миллионов клиентов.</li>
       <li><strong>Инновации:</strong> Используем современные технологии для обеспечения комфортного и безопасного сервиса.</li>
       <li><strong>Доступность:</strong> Наши филиалы расположены в удобных местах, а услуги доступны онлайн 24/7.</li>
     </ul>
+    
     <p>
       Наша миссия — помогать клиентам достигать финансовых целей, предлагая индивидуальные решения и поддержку на всех этапах их пути.
     </p>
 </div>
-
   <!-- Main Content -->
   <div id="containermain" class="container hidden">
     <!-- Hidden Intro Text -->
     <div id="intro-text">
       <p>Этот сайт предназначен для подачи онлайн-заявок на кредит. Вы можете рассчитать сумму кредита, процентную ставку и срок, а также подать заявку через форму калькулятора.</p>
     </div>
-
     <!-- Hidden Calculator Form -->
     <div id="calculator">
       <h1>Кредитный калькулятор</h1>
       <form id="loan-form">
-        <p>Ф.И.О</p>
-        <input id="fio" type="text" placeholder="ФИО" required />
-        <p>Сумма кредита в сумах</p>
-        <input id="amount" type="number" placeholder="Сумма кредита" required />
-        <p> Годовая процентная ставка%</p>
-        <input id="interestRate" type="number" placeholder="Процентная ставка" required />
+        <label for="amount">Сумма кредита в сумах</label>
+        <input id="amount" type="text" placeholder="Сумма кредита" required oninput="formatNumber(this)" />
+
+        <script>
+          function formatNumber(input) {
+            // Убираем все пробелы и некорректные символы
+            const value = input.value.replace(/\s+/g, '').replace(/[^\d]/g, '');
+        
+            // Форматируем число с пробелами
+            const formattedValue = value.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+        
+            // Обновляем значение поля
+            input.value = formattedValue;
+          }
+        </script>
+        <br>Годовая процентная ставка%
+        <select id="interestRate" required>
+          <option value="15">15% Для юных предпринимателей студентов</option>
+          <option value="23">23% Для Физических лиц</option>
+          <option value="27">27% Для Юридических</option>
+        </select>
+        
         <p>Срок в годах</p>
         <input id="termYears" type="number" placeholder="Срок в годах" required />
         
         <button type="button" onclick="calculate()">Рассчитать</button>
         <button type="button" onclick="clearForm()">Очистить</button>
-        <button type="submit">Отправить</button> <!-- Это кнопка "Отправить" -->
+      
       </form>
       <div class="apply-loan">
         <button onclick="openLoanForm()">Оформить кредит</button>
     </div>
     <!-- Модальное окно для оформления кредита -->
-    <div id="loanModal" class="modal">
-        <div class="modal-content hidden">
-            <span class="close" onclick="closeLoanForm()">&times;</span>
-            <h2>Заявка на кредит</h2>
-            <label for="fullName">Ф.И.О.</label>
-            <input type="text" id="fullName" placeholder="Введите ваше Ф.И.О." required>
-    
-            <label for="birthDate">Дата рождения:</label>
-            <input type="date" id="birthDate" />
-            
-            <label for="address">Адрес</label>
-            <input type="text" id="address" placeholder="Введите ваш адрес" required>
-            <br>
-            <label>Серия паспорта</label>
-            <select id="serialpass" required>
-                <option value="AD">AD</option>
-                <option value="KA">KA</option>
-            </select>
-            <label for="passnumber">Номер паспорта</label>
-            <input type="number" id="passnum" placeholder="Введите номер паспорта" required>
-            <label for="PINFL">ПИНФЛ ЖШШИР</label>
-            <input type="number" id="pinflnum" placeholder="Введите ПИНФЛ (ЖШШИР)" required>
-            <label for="phone">Телефон</label>
-            <input type="tel" id="phone" placeholder="Введите ваш телефон" required>
-            <label for="photo">Фотография паспорта:</label>
-            <input type="file" id="photo" accept="image/*" required><br>
-            <label for="email">Эл. почта:</label>
-            <input type="email" id="email" required placeholder="example@example.com"><br>
-            <label for="clientType">Тип клиента</label>
-            <select id="clientType" required>
-                <option value="student">Студент (13%)</option>
-                <option value="physclient">Физическое лицо (22%)</option>
-                <option value="lawclient">Юридическое лицо (19%)</option>
-            </select>
-    
-            <label for="loanSum">Сумма кредита</label>
-            <input type="number" id="loanSum" placeholder="Введите сумму кредита" required>
-    
-            <button type="button" onclick="submitLoanApplication()">Отправить заявку</button>
-        </div>
-    </div>
+    <!-- Модальное окно для заявки -->
+<div id="loanModal" class="modal hidden">
+  <div class="modal-content">
+      <!-- Кнопка закрытия -->
+      <span class="close" onclick="closeLoanForm()">&times;</span>
+
+      <h2>Заявка на кредит</h2>
+      
+      <label for="fullName">Ф.И.О.</label>
+      <input type="text" id="fullName" placeholder="Введите ваше Ф.И.О." required>
+
+      <label for="birthDate">Дата рождения:</label>
+      <input type="date" id="birthDate" required>
+      
+      <label for="address">Адрес</label>
+      <input type="text" id="address" placeholder="Введите ваш адрес" required>
+
+      <label>Серия паспорта</label>
+      <select id="serialpass" required>
+          <option value="AD">AD</option>
+          <option value="KA">KA</option>
+      </select>
+      
+      <label for="passnum">Номер паспорта</label>
+      <input type="number" id="passnum" placeholder="Введите номер паспорта" required>
+      
+      <label for="pinflnum">ПИНФЛ ЖШШИР</label>
+      <input type="number" id="pinflnum" placeholder="Введите ПИНФЛ (ЖШШИР)" required>
+      
+      <label for="phone">Телефон</label>
+      <input type="tel" id="phone" placeholder="Введите ваш телефон" required>
+      
+      <label for="email">Эл. почта:</label>
+      <input type="email" id="email" required placeholder="example@example.com">
+      
+      <label for="clientType">Тип клиента</label>
+      <select id="clientType" required>
+          <option value="Студент">Студент (15%)</option>
+          <option value="ФизикЛицо">Физическое лицо (23%)</option>
+          <option value="ЮрдикЛицо">Юридическое лицо (27%)</option>
+      </select>
+
+      <label for="loanSum">Сумма кредита</label>
+      <input type="number" id="loanSum" placeholder="Введите сумму кредита" required oninput="formatNumber(this)">
+      
+      <button type="button" onclick="submitLoanApplication()">Отправить заявку</button>
+  </div>
+</div>
+
       <div id="result"></div>
       <div id="error"></div>
       
@@ -163,9 +194,9 @@
     <div class="footer-section">
       <h3>О нас</h3>
       <ul>
-        <li><a href="javascript:void(0)" onclick="toggleAboutbank()"> О банке</a></li>
+        <li><a href="javascript:void(0)" onclick="toggleAboutBank()"> О банке</a></li>
         <li><a href="#">Наши услуги</a></li>
-        <li><a href="#">Контакты</a></li>
+        <li><a href="javascript:void(0)" onclick="toggleContacts()">Контакты</a></li>
         <li><a href="#">Вакансии</a></li>
       </ul>
     </div>
@@ -180,9 +211,9 @@
     </div>
     <div class="footer-section">
       <h3>Связь с нами</h3>
-      <p>Телефон: +7 (123) 456-78-90</p>
-      <p>Email: support@bank.com</p>
-      <p>Адрес: ул. Примерная, 10, Москва</p>
+      <p>Телефон: +998(93) 474-39-18</p>
+      <p>Email: azabank@gmail.com</p>
+      <p>Адрес: ул. проспект Амира Темура, 117, Ташкент. Узбекистан</p>
     </div>
   </div>
   <div class="footer-bottom">
